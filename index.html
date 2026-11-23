@@ -284,9 +284,9 @@ body.calm .sh,body.calm #drawer h4{color:#5E5280}
 <div id="ov">
   <div id="modal">
     <h3>Keyword tracking</h3>
-    <div class="sub">add keywords to track and get those posts first</div>
-    <input id="kw" type="text" placeholder="type a keyword then press enter">
-    <div class="hint">press enter to add, and x to remove the keyword.</div>
+    <div class="sub">Add keywords to track and get those posts first</div>
+    <input id="kw" type="text" placeholder="Type a keyword then press enter">
+    <div class="hint">Press enter to add, and x to remove the keyword.</div>
     <div id="tags"></div>
     <div class="btns"><button class="b-c" id="kcancel">Cancel</button><button class="b-s" id="ksave" disabled>Save</button></div>
   </div>
@@ -500,7 +500,7 @@ function renderCats(){
     h+='<div class="cat'+(c.n===catFilter?' sel':'')+'" data-c="'+i+'"><span class="sq" style="background:'+(calm?PAL[i%PAL.length]:c.c)+'"></span><span>'+esc(c.n)+'</span><span class="x" data-x="'+i+'">×</span></div>';
   });
   $('cats').innerHTML=h;
-  if(adding)$('addrow').innerHTML='<div id="addcat"><span style="font-size:1.6rem;line-height:1">+</span><input id="addin" type="text" placeholder="type a category name, then press enter."></div>';
+  if(adding)$('addrow').innerHTML='<div id="addcat"><span style="font-size:1.6rem;line-height:1">+</span><input id="addin" type="text" placeholder="Type a category name, then press enter."></div>';
   else $('addrow').innerHTML='<div id="addcat" data-add="1"><span style="font-size:1.6rem;line-height:1">+</span><span>Add a category</span></div>';
   if(adding)$('addin').focus();
 }
