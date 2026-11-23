@@ -63,8 +63,9 @@ svg{display:block}
 .cat .sq{width:.65rem;height:.65rem;border-radius:2px;margin-right:.65rem;flex:none}
 .cat .x{margin-left:auto;font-size:1rem;color:#888;opacity:0;cursor:pointer;padding:0 .25rem;line-height:1}
 .cat:hover .x{opacity:1}
-#addcat{display:flex;align-items:center;height:30px;padding:0 1.1rem;gap:.55rem;color:var(--purple);font-size:1.1rem;cursor:pointer}
-#addcat input{flex:1;min-width:0;height:2rem;border:1px solid #bbb;border-radius:4px;padding:0 .5rem;font:inherit;font-size:1.05rem;outline:none}
+#addcat{display:flex;align-items:center;height:30px;padding:0 1.1rem;color:var(--purple);font-size:1.15rem;cursor:pointer}
+#addcat .pl{width:.65rem;margin-right:.65rem;flex:none;text-align:center;font-size:1.3rem;line-height:1}
+#addcat input{flex:1;min-width:0;height:26px;border:1px solid #bbb;border-radius:4px;padding:0 .4rem;margin-left:-.4rem;font:inherit;font-size:1.05rem;outline:none}
 #addcat input:focus{border-color:var(--purple)}
 #tasks{position:fixed;right:16px;bottom:16px;width:300px;background:#fff;border:1px solid #d0d0d0;border-radius:8px;padding:10px 14px;z-index:40}
 body.drawer-open #tasks{right:336px}
@@ -500,8 +501,8 @@ function renderCats(){
     h+='<div class="cat'+(c.n===catFilter?' sel':'')+'" data-c="'+i+'"><span class="sq" style="background:'+(calm?PAL[i%PAL.length]:c.c)+'"></span><span>'+esc(c.n)+'</span><span class="x" data-x="'+i+'">×</span></div>';
   });
   $('cats').innerHTML=h;
-  if(adding)$('addrow').innerHTML='<div id="addcat"><span style="font-size:1.6rem;line-height:1">+</span><input id="addin" type="text" placeholder="Type a category name, then press enter."></div>';
-  else $('addrow').innerHTML='<div id="addcat" data-add="1"><span style="font-size:1.6rem;line-height:1">+</span><span>Add a category</span></div>';
+  if(adding)$('addrow').innerHTML='<div id="addcat"><span class="pl">+</span><input id="addin" type="text" placeholder="Type a category name"></div>';
+  else $('addrow').innerHTML='<div id="addcat" data-add="1"><span class="pl">+</span><span>Add a category</span></div>';
   if(adding)$('addin').focus();
 }
 function renderTasks(){
@@ -586,6 +587,9 @@ $('catsec').addEventListener('click',function(e){
     return;
   }
   if(e.target.closest('[data-add]')){adding=true;renderCats()}
+});
+document.addEventListener('click',function(e){
+  if(adding&&!e.target.closest('#addcat')){adding=false;renderCats()}
 });
 $('catsec').addEventListener('keydown',function(e){
   if(e.target.id!=='addin')return;
