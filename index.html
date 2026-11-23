@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CS6750 – Ed Discussion</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --hl-sel:#e8effc;
+  --top:#50288c; --purple:#50288c; --accent:#1a62c5; --bg:#f4f4f4;
+  --hl-course:#cfdcf9; --hl-track:#e6f1ff; --chip-bg:#dbe9fb;
+  --badge-bg:#ffeb3b; --badge-bd:#c9b400; --badge-tx:#333; --dot:#1a6bff;
+  --pill-bg:#e8e8e8; --pill-tx:#666; --sw-on:#2fb344; --trkb:#1a62c5; --chip-tx:#1a62c5; --chip-on:#1a62c5; --chip-fill:#1a62c5;
+}
+body.calm{
+  --top:#5E5280; --purple:#5E5280; --accent:#5E5280; --bg:#E6E0F0;
+  --hl-course:#E6E0F0; --hl-sel:#E6E0F0; --hl-track:#E3EEF5; --chip-bg:#8E7FB0;
+  --badge-bg:#8E7FB0; --badge-bd:#8E7FB0; --badge-tx:#fff; --dot:#8E7FB0;
+  --pill-bg:#8E7FB0; --pill-tx:#fff; --sw-on:#8E7FB0; --trkb:#8E7FB0; --chip-tx:#fff; --chip-on:#5E5280; --chip-fill:#8E7FB0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+html,body{width:100%;height:100vh;overflow:hidden}
+body{font-family:"Source Sans Pro","Source Sans 3","Helvetica Neue",Arial,sans-serif;color:#222;background:var(--bg);font-size:13px;display:flex;flex-direction:column}
+button{font-family:inherit;font-size:inherit;cursor:pointer;border:0;background:none;color:inherit}
+svg{display:block}
+
+/* top bar */
+#top{height:48px;flex:none;background:var(--top);display:flex;align-items:center;color:#fff}
+#top .ed{font-size:2.3rem;font-weight:700;margin-left:1.9rem;letter-spacing:-1px}
+#top .gt{display:flex;align-items:center;margin-left:1.8rem;gap:.35rem}
+#top .gt b{font-family:Georgia,serif;font-size:2.3rem;line-height:1}
+#top .gt span{font-size:1.2rem;line-height:1;font-weight:600}
+#top .title{font-size:1.75rem;margin-left:1.8rem;font-weight:300}
+#top .right{margin-left:auto;display:flex;align-items:center;height:100%}
+#top .ib{width:4.2rem;height:100%;display:flex;align-items:center;justify-content:center}
+#top .ib.active{background:rgba(0,0,0,.25)}
+#top .sep{width:1px;height:2.2rem;background:rgba(255,255,255,.25);margin:0 .5rem 0 .6rem}
+#top .avatar{width:3rem;height:3rem;border-radius:50%;background:#c01fd0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 1rem 0 .6rem}
+.calm-t{display:flex;align-items:center;gap:.5rem;font-size:1rem;margin-right:.8rem}
+.sw{width:2.2rem;height:1.2rem;border-radius:.6rem;background:#999;position:relative;display:inline-block;flex:none;cursor:pointer}
+.sw::after{content:"";position:absolute;top:.15rem;left:.15rem;width:.9rem;height:.9rem;border-radius:50%;background:#fff}
+.sw.on{background:var(--sw-on)}
+.sw.on::after{left:1.15rem}
+
+#main{display:flex;flex:1;min-height:0}
+
+/* sidebar */
+#side{width:220px;flex:none;background:#fafafa;border-right:1px solid #e3e3e3;display:flex;flex-direction:column;min-height:0}
+#newthread{margin:.8rem 1rem 0 1rem;height:3.2rem;border-radius:.4rem;background:#1067f0;color:#fff;font-size:1.25rem;display:flex;align-items:center;justify-content:center;gap:.55rem;flex:none}
+.sh{font-size:.95rem;font-weight:600;color:#666;letter-spacing:.2px;padding:0 1.1rem}
+#courses{padding:0 .3rem;flex:none}
+.course{display:flex;align-items:center;height:2.5rem;padding:0 .8rem 0 .85rem;font-size:1.15rem;border-radius:.5rem;margin-bottom:.1rem;cursor:pointer}
+.course.sel{background:var(--hl-course)}
+.course .n{margin-left:auto;color:var(--accent);font-size:1rem}
+#catsec{border-top:1px solid #e3e3e3;margin-top:.5rem;padding-top:.9rem;display:flex;flex-direction:column;flex:1;min-height:0}
+#autotag{padding:.5rem 1.1rem .1rem;flex:none}
+#autotag .row{display:flex;align-items:center;gap:.5rem;font-size:.9rem;color:#444}
+#autotag .lbl{font-size:12px;color:#888;margin:.3rem 0 0}
+#cats{overflow-y:auto;flex:1;min-height:0}
+#addrow{flex:none}
+.cat{display:flex;align-items:center;height:30px;padding:0 1.1rem;font-size:1.15rem;position:relative}
+.cat .sq{width:.65rem;height:.65rem;border-radius:2px;margin-right:.65rem;flex:none}
+.cat .x{margin-left:auto;font-size:1rem;color:#888;opacity:0;cursor:pointer;padding:0 .25rem;line-height:1}
+.cat:hover .x{opacity:1}
+#addcat{display:flex;align-items:center;height:30px;padding:0 1.1rem;gap:.55rem;color:var(--purple);font-size:1.1rem;cursor:pointer}
+#addcat input{flex:1;min-width:0;height:2rem;border:1px solid #bbb;border-radius:4px;padding:0 .5rem;font:inherit;font-size:1.05rem;outline:none}
+#addcat input:focus{border-color:var(--purple)}
+#tasks{position:fixed;right:16px;bottom:16px;width:300px;background:#fff;border:1px solid #d0d0d0;border-radius:8px;padding:10px 14px;z-index:40}
+body.drawer-open #tasks{right:336px}
+#tasks.min{width:auto;border-radius:999px;padding:6px 12px}
+#tasks .th{font-size:.9rem;color:#666;cursor:pointer;display:flex;align-items:center;gap:.5rem;width:100%;text-align:left}
+#tasks .th .cnt{margin-left:auto;color:#666;font-size:.85rem}
+#tasks.min .th .cnt{margin-left:.1rem}
+#tasks .th .cnt.all{color:#50288c}
+#tasks ul{list-style:none;margin-top:.4rem}
+#tasks li{font-size:.85rem;color:#666;display:flex;align-items:center;gap:.5rem;height:1.45rem}
+#tasks li .bx{width:.8rem;height:.8rem;border:1px solid #aaa;border-radius:2px;flex:none;font-size:.65rem;line-height:.65rem;text-align:center;color:#fff}
+#tasks li.done .bx{background:#8a8a8a;border-color:#8a8a8a}
+#tasks li.done span{text-decoration:line-through}
+#reset{display:block;margin-top:.45rem;font-size:.8rem;color:#666;text-decoration:underline}
+#online{border-top:1px solid #e3e3e3;height:3.1rem;display:flex;align-items:center;justify-content:center;gap:.55rem;font-size:1.05rem;color:#555;flex:none}
+
+/* list */
+#list{width:340px;flex:none;background:#fff;border-right:1px solid #e0e0e0;display:flex;flex-direction:column;min-height:0}
+#search{height:3.7rem;border-bottom:1px solid #e3e3e3;display:flex;align-items:center;padding:0 1rem;gap:.8rem;flex:none}
+#search input{border:0;outline:0;font:inherit;font-size:1.5rem;color:#444;flex:1;min-width:0;background:none}
+#search input::placeholder{color:#666}
+#fbar{height:2.6rem;border-bottom:1px solid #e3e3e3;display:flex;align-items:center;padding:0 .9rem;flex:none;background:#fafafa}
+#fbar .lk{color:var(--accent);font-size:1rem;font-weight:600;display:flex;align-items:center;gap:.3rem}
+#fbar .chip{cursor:pointer;background:transparent;border:1px solid var(--accent);color:var(--accent);font-size:.8rem;font-weight:600;border-radius:.7rem;padding:.1rem .6rem}
+#fbar .chip.on{background:var(--chip-fill);border-color:var(--chip-fill);color:#fff}
+#fbar .sp{flex:1}
+#trackbtn{height:28px;border:1px solid var(--accent);color:var(--accent);border-radius:14px;padding:0 12px;display:flex;align-items:center;gap:6px;font-size:1rem;font-weight:600;margin-right:12px}
+#threads{overflow-y:auto;flex:1;min-height:0}
+.card{padding:0 1.5rem;cursor:pointer}
+.card .in{padding:12px 0;border-bottom:1px solid #e6e6e6}
+.card.trk{box-shadow:inset 3px 0 0 var(--trkb)}
+.trow{display:flex;align-items:center;gap:.7rem;height:1.6rem;position:relative}
+.trow svg{flex:none}
+.trow .t{font-size:14px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.trow .dot{position:absolute;left:0;top:.65rem;width:.45rem;height:.45rem;border-radius:50%;background:var(--dot)}
+.mrow{display:flex;align-items:center;flex-wrap:nowrap;font-size:12px;color:#444;margin-top:.4rem;height:1.25rem;overflow:hidden}
+.mrow>*{white-space:nowrap;flex:none}
+.mrow .cl{font-weight:700;margin-right:.7rem;max-width:9rem;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:0}
+.mrow .cl.cl2{margin-right:.4rem}
+.mrow .asqs{display:flex;gap:4px;margin-right:.7rem}
+.asq{width:10px;height:10px;border-radius:2px;display:block}
+.mrow .au{max-width:6.5rem;overflow:hidden;text-overflow:ellipsis;margin-right:.5rem;flex:0 1 auto;min-width:0}
+.badge{font-size:.52rem;font-weight:800;background:var(--badge-bg);border:1px solid var(--badge-bd);color:var(--badge-tx);padding:0 .2rem;line-height:.7rem;border-radius:2px;margin-right:.7rem}
+.mrow .tm{margin-right:auto}
+.mrow .cm{display:flex;align-items:center;gap:.35rem;font-size:12px;margin-right:.6rem}
+.mrow .hr{width:1.9rem;display:flex;align-items:center;gap:.3rem;font-size:12px}
+.nw{color:#b3202a}
+.bl{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:400;color:#888;padding:0 1.5rem;margin:8px 0}
+.bl::after{content:"";flex:1;height:1px;background:#E0E0E0}
+.sq2{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+
+/* right */
+#empty{flex:1;min-width:0;position:relative;background:var(--bg);overflow:hidden}
+#empty.thread{background:#fff}
+
+#rp{height:100%;overflow-y:auto;display:flex}
+#ph{margin:auto;text-align:center}
+#ph .tx{font-size:2rem;color:#6e6e6e;font-weight:300;margin-top:1.2rem}
+#ph svg{margin:0 auto}
+
+#drawer{z-index:6;position:absolute;top:0;bottom:0;right:0;width:320px;background:#fff;border-left:1px solid #ddd;overflow-y:auto;padding:1.3rem 1.3rem;display:none}
+#drawer.open{display:block}
+#drawer h4{font-size:.85rem;color:#666;letter-spacing:.2px;font-weight:600;margin:0 0 .5rem}
+#drawer .sec{margin-bottom:1.5rem}
+#drawer .it{padding:.55rem 0;border-bottom:1px solid #eee}
+#drawer .it .a{font-size:1rem;color:#222}
+#drawer .it .b{font-size:.8rem;color:#888;margin-top:.15rem}
+#atab{position:absolute;right:0;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;background:var(--purple);color:#fff;font-size:.95rem;padding:1rem .55rem;border-radius:6px 0 0 6px;z-index:5}
+#atab.open{right:320px}
+
+/* modal */
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:50}
+#ov.open{display:flex}
+#modal{background:#fff;border-radius:8px;width:30rem;max-width:90vw;padding:1.6rem}
+#modal h3{color:#000;font-size:1.4rem;font-weight:600}
+#modal .sub{font-size:12px;color:#777;margin:.25rem 0 .9rem}
+#modal input{width:100%;height:2.6rem;border:1px solid #ccc;border-radius:5px;padding:0 .7rem;font:inherit;font-size:1.05rem;outline:none}
+#modal input:focus{border-color:var(--purple)}
+#tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem;min-height:2rem}
+.tag{display:flex;align-items:center;gap:.4rem;background:#f0eef5;border-radius:4px;padding:.25rem .55rem;font-size:1rem;color:#333}
+.tag .x{cursor:pointer;color:#777;font-size:1rem;line-height:1}
+#modal .btns{display:flex;justify-content:flex-end;gap:.7rem;margin-top:1.3rem}
+.b-c{background:#fff;color:var(--purple);border:1px solid var(--purple)!important;border-radius:5px;height:2.5rem;padding:0 1.4rem;font-size:1.05rem}
+.b-s{background:var(--purple);color:#fff;border-radius:5px;height:2.5rem;padding:0 1.5rem;font-size:1.05rem}
+
+/* toast */
+#toast{position:fixed;left:50%;bottom:1.7rem;transform:translateX(-50%);background:#333;color:#fff;font-size:14px;border-radius:8px;padding:12px 16px;display:none;z-index:60;white-space:nowrap}
+#toast.show{display:block}
+#toast a{color:#8547E2;cursor:pointer;margin-left:.3rem;text-decoration:none}
+body.calm #toast a{color:var(--purple)}
+#modal .hint{font-size:12px;color:#777;margin-top:.4rem}
+.b-s:disabled{opacity:.4;cursor:not-allowed}
+#drawer .it.clk{cursor:pointer}
+#drawer .tg{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.4rem}
+#drawer .none{font-size:12px;color:#999}
+#threads .none{padding:1.2rem 1.5rem;color:#888;font-size:1rem}
+#fchips{display:none;padding:.6rem .9rem;border-bottom:1px solid #e3e3e3;flex:none}
+.fchip{display:inline-flex;align-items:center;gap:.4rem;background:var(--chip-bg);color:var(--chip-tx);font-size:.9rem;font-weight:600;border-radius:.8rem;padding:.2rem .7rem}
+.fchip .fx{cursor:pointer;font-size:1rem;line-height:1}
+.cat{cursor:pointer}
+.cat.sel{background:var(--hl-course)}
+.card.sel{background:var(--hl-sel)}
+#detail{display:none;flex:1;min-width:0;padding:36px 48px 250px}
+#detail.on{display:block}
+#detail h1{font-size:2.15rem;font-weight:400;color:#222;line-height:1.2}
+#detail h1 small{font-size:.8em;color:#999;margin-left:1rem;font-weight:300}
+#detail .ah{display:flex;align-items:center;gap:.8rem;margin-top:1.3rem}
+#detail .av{width:48px;height:48px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex:none}
+#detail .nm{color:#d9480f;font-size:1.3rem}
+#detail .sub2{color:#666;font-size:1rem;margin-top:.1rem}
+#detail .acts{margin-left:auto;display:flex;gap:2.2rem;text-align:center;font-size:.85rem;color:#666}
+#detail .acts div{display:flex;flex-direction:column;align-items:center;gap:.25rem}
+#detail .acts .pl{color:#8a2be2}
+#detail .acts .vw{font-size:1.9rem;color:#222;line-height:1}
+#detail .pb{display:flex;gap:1.3rem;margin-top:1.2rem}
+#detail .lk2{width:2.8rem;flex:none;text-align:center;color:#666;font-size:1.6rem}
+#detail .lk2 svg{margin:0 auto .2rem}
+#detail .txt{font-size:1.25rem;line-height:1.55;color:#333}
+#detail .crow{margin:1rem 0 0 4.1rem;color:#888;font-size:1.1rem}
+#detail .srt{text-align:right;color:#666;font-size:1rem;margin-top:.8rem}
+#detail .addc{margin-top:.6rem;border:1px solid #ddd;border-radius:4px;background:#fff;height:2.9rem;display:flex;align-items:center;gap:.8rem;padding:0 1rem;color:#777;font-size:1.15rem}
+#detail .c{display:flex;gap:.8rem;margin-top:1.4rem}
+#detail .c .av{width:44px;height:44px;font-size:1.4rem}
+#detail .c.r{margin-left:3rem}
+#detail .c.r .av{width:36px;height:36px;font-size:1.1rem}
+#detail .cb{border-left:3px solid #7ac143;padding-left:.8rem;flex:1;min-width:0}
+#detail .cb .hd{font-size:1rem;color:#888}
+#detail .cb .hd b{font-weight:400;color:#d9480f}
+#detail .cb .ct{font-size:1.1rem;line-height:1.5;color:#333;margin-top:.15rem}
+#detail .cb .ft{color:#888;font-size:1.05rem;margin-top:.7rem;display:flex;align-items:center;gap:1rem}
+/* calm overrides */
+body.calm #newthread{background:#5E5280}
+body.calm #online svg{fill:#7A9A82}
+body.calm #top .avatar{background:#D9D0EA;color:#2B2B2B}
+body.calm .pin{fill:#8E7FB0}
+body.calm .ck{stroke:#7A9A82}
+body.calm .nw{color:#9A5B57}
+body.calm #toast{background:#fff;color:#2b2b2b;border:1px solid #C9C3D8}
+body.calm #detail .nm,body.calm #detail .cb .hd b{color:#3b3b3b}
+body.calm #detail .cb{border-left-color:#D0D0D0}
+body.calm #detail .acts .pl{color:#4A4A4A}
+body.calm .sh,body.calm #autotag .row,body.calm #autotag .lbl,body.calm .cat .x,body.calm #online,body.calm #ph .tx,body.calm #detail .sub2,body.calm #detail .acts,body.calm #detail h1 small,body.calm #detail .crow,body.calm #detail .srt,body.calm #detail .addc,body.calm #detail .cb .hd,body.calm #detail .cb .ft,body.calm #drawer h4,body.calm #drawer .it .b,body.calm #modal .sub,body.calm #modal .hint,body.calm .tag .x,body.calm .bl{color:#4A4A4A}
+body.calm #detail .acts .pl{color:#4A4A4A}
+body.calm .tag{background:#8E7FB0;color:#fff}
+body.calm .tag .x{color:#fff}
+body.calm .tag svg path{stroke:#fff}
+body.calm .tag svg circle{fill:#fff}
+body.calm #drawer .none,body.calm #threads .none{color:#4A4A4A}
+body.calm .sh,body.calm #drawer h4{color:#5E5280}
+</style>
+</head>
+<body>
+
+<div id="top">
+  <div class="ed">ed</div>
+  <div class="gt"><b>GT</b><span>Georgia<br>Tech</span></div>
+  <div class="title">CS6750 – Ed Discussion</div>
+  <div class="right">
+    <div class="ib active"><svg width="26" height="24" viewBox="0 0 28 26" fill="#fff"><path d="M3 1h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-5 4v-4H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2z"/><path d="M23 7h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2v4l-5-4h-8" opacity=".85"/></svg></div>
+    <div class="ib"><svg width="24" height="22" viewBox="0 0 26 24" fill="#fff" opacity=".9"><path d="M13 2 1 8l12 6 10-5v7h2V8z"/><path d="M5 14v4c0 2 4 4 8 4s8-2 8-4v-4l-8 4z"/></svg></div>
+    <div class="sep"></div>
+    <div class="ib"><svg width="30" height="26" viewBox="0 0 32 28" fill="#fff" opacity=".9"><path d="M16 2 1 15h4v11h8v-8h6v8h8V15h4z"/></svg></div>
+    <label class="calm-t"><span>Calm</span><span class="sw" id="calmsw" role="switch" aria-checked="false" tabindex="0"></span></label>
+    <div class="ib"><svg width="24" height="26" viewBox="0 0 26 28" fill="#fff" opacity=".9"><path d="M13 1a2 2 0 0 0-2 2v1.2C7.6 5.1 5 8.2 5 12v6l-3 4v1h22v-1l-3-4v-6c0-3.800-2.600-6.900-6-7.800V3a2 2 0 0 0-2-2zm-3 23a3 3 0 0 0 6 0z"/></svg></div>
+    <div class="avatar">K</div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="side">
+    <button id="newthread"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M11 4H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-6"/><path d="M18.500 2.500a2.100 2.100 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>New Thread</button>
+    <div class="sh" style="margin:1.6rem 0 .6rem">Courses</div>
+    <div id="courses">
+      <div class="course sel">CS6750<span class="n">1</span></div>
+      <div class="course">CS7637<span class="n">3</span></div>
+      <div class="course">Fall 2026 New Students</div>
+      <div class="course">OMSCS Commons<span class="n">142</span></div>
+      <div class="course">Reading Groups</div>
+    </div>
+    <div id="catsec">
+      <div class="sh">Categories</div>
+      <div id="autotag">
+        <div class="row"><span class="sw" id="atsw" role="switch" aria-checked="false" tabindex="0" title="Automatically tag threads with your own categories"></span><span>Auto-tag</span></div>
+        <div class="lbl" id="atlbl">Auto-tagged</div>
+      </div>
+      <div id="cats"></div>
+      <div id="addrow"></div>
+    </div>
+    <div id="online"><svg width="18" height="18" viewBox="0 0 24 24" fill="#2fb344"><circle cx="12" cy="7" r="5"/><path d="M2 22c0-5 4-8 10-8s10 3 10 8z"/></svg>61 others online</div>
+  </div>
+
+  <div id="list">
+    <div id="search"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2"><circle cx="10" cy="10" r="7"/><path d="m15 15 6 6"/></svg><input id="sin" placeholder="Search"></div>
+    <div id="fbar">
+      <span class="chip" id="trkchip" style="display:none"></span>
+      <span class="sp"></span>
+      <button id="trackbtn"><svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.300"><path d="M1 1h6l6 6-6 6-6-6z"/><circle cx="4.500" cy="4.500" r=".8" fill="currentColor"/></svg>Track</button>
+      <button class="lk">Filter <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.300"><path d="m2 4 4 4 4-4"/></svg></button>
+    </div>
+    <div id="fchips"></div>
+    <div id="threads"></div>
+  </div>
+
+  <div id="empty">
+    <div id="rp">
+      <div id="ph">
+        <svg width="100" height="100" viewBox="0 0 112 112"><path d="M4 2h78a2 2 0 0 1 2 2v52a2 2 0 0 1-2 2H34L4 80z" fill="#d8d8d8" transform="scale(1 .78)"/><path d="M30 38h78v58l-24-20H30z" fill="#e4e4e4"/><path d="M0 60 L30 60 L30 82z" fill="#d8d8d8"/></svg>
+        <div class="tx">Select a thread</div>
+      </div>
+      <div id="detail"></div>
+    </div>
+    <button id="atab">Your activity</button>
+    <div id="drawer"></div>
+  </div>
+</div>
+
+<div id="ov">
+  <div id="modal">
+    <h3>Keyword tracking</h3>
+    <div class="sub">add keywords to track and get those posts first</div>
+    <input id="kw" type="text" placeholder="type a keyword then press enter">
+    <div class="hint">press enter to add, and x to remove the keyword.</div>
+    <div id="tags"></div>
+    <div class="btns"><button class="b-c" id="kcancel">Cancel</button><button class="b-s" id="ksave" disabled>Save</button></div>
+  </div>
+</div>
+
+<div id="tasks">
+  <button class="th" id="tth" aria-label="Toggle tasks"><span id="ttl">Your tasks</span><span class="cnt" id="tcnt"></span><span id="tcar"></span></button>
+  <ul id="tlist"></ul>
+  <button id="reset">Reset prototype</button>
+</div>
+
+<div id="toast"><span id="ttx"></span><a id="tundo">Undo</a></div>
+
+<script>
+(function(){
+var PAL=['#A8C5DA','#B5D8B8','#F2D7A6','#E8B4B0','#C9B5DC','#B7DDD9','#F0C4D6','#C8D9A0'];
+function mkCatalog(){return [
+ {n:'Announcements',c:'#1fb36b',t:'#0e8a3e',side:true},
+ {n:'Lectures',c:'#f5a31a',t:'#b86e00',side:true},
+ {n:'Homework',c:'#e0533d',t:'#b8321e',side:true},
+ {n:'Tests',c:'#9b59b6',t:'#7b3c96',side:true},
+ {n:'Quiz',c:'#4dd0c8',t:'#1e9a92',side:true},
+ {n:'Individual Project',c:'#f0338b',t:'#c4146a',side:true},
+ {n:'Team Project',c:'#a5d63f',t:'#6a8f00',side:true},
+ {n:'Participant Recruitment',c:'#6b63d1',t:'#5a52c0',side:true},
+ {n:'Overleaf Help',c:'#6fc46a',t:'#3f9a3a',side:true},
+ {n:'Social',c:'#b0286a',t:'#b0286a',side:true},
+ {n:'Resources',c:'#7aa89a',t:'#4f8070',side:true},
+ {n:'Peer Review',c:'#0a5fc1',t:'#0a5fc1',side:true}
+];}
+
+function mkThreads(){return [
+ {title:'Week 14 announcements',ty:'ann',pin:1,staff:1,unread:1,cat:'Announcements',lt:'Announcements',au:'Priya Anand',tm:'1d',cm:12,nw:3,lk:14},
+ {title:'Individual Project grades',ty:'post',pin:1,staff:1,cat:'Individual Project',lt:'Individual Project',au:'Marcus Ellery',tm:'2d',cm:31,un:5,lk:6},
+ {title:'Team project recruitement',ty:'post',pin:1,staff:1,cat:'Team Project',lt:'Team Project',au:'Lena Fortuna',tm:'4d',cm:87,un:12,lk:9},
+ {title:'Final exam logistics',ty:'q',res:1,staff:1,cat:'Tests',lt:'Tests',au:'Tomas Reyes',tm:'6h',cm:8,nw:2,lk:4},
+ {title:'Quiz 4 study notes',ty:'post',cat:'Quiz',lt:'Quiz',au:'Noor Haddad',tm:'3h',cm:4,lk:3},
+ {title:'Survey responses for my study',ty:'q',unread:1,cat:'Participant Recruitment',lt:'Participant Recruitment',au:'Klea Pregja',tm:'5h',cm:2,nw:2},
+ {title:'Overleaf compile error on the template',ty:'q',cat:'Overleaf Help',lt:'Overleaf Help',au:'Anonymous Heron',tm:'9h',cm:6,un:1},
+ {title:'Peer review deadline question',ty:'q',res:1,cat:'Peer Review',lt:'Peer Review',au:'Imani Brooks',tm:'14h',cm:3,lk:1},
+ {title:'Rubric for the team project check-in',ty:'q',unread:1,cat:'Team Project',lt:'Team Project',au:'Caleb Whitmore',tm:'1d',cm:11,nw:1},
+ {title:'Can someone share their interview script?',ty:'q',cat:'Resources',lt:'Resources',au:'Anonymous Lynx',tm:'2d'},
+ {title:'Homework 4 grading policy',ty:'post',cat:'Homework',lt:'Homework',au:'Klea Pregja',tm:'2d',cm:22,un:3,lk:5},
+ {title:'Lecture 2.8 cognitive load examples',ty:'post',cat:'Lectures',lt:'Lectures',au:'Felix Aurelio',tm:'3d',cm:9,lk:7},
+ {title:'Looking for survey participants',ty:'q',res:1,cat:'Participant Recruitment',lt:'Participant Recruitment',au:'Klea Pregja',tm:'4d',cm:15,lk:2}
+];}
+var selTitle=null;
+var catalog,threads,tracked,draft,calm,autotag,adding,tasksOpen,done,toastTimer,catFilter,trkOnly;
+var taskNames=['Turn on automatic tagging','Add a category called "Interview Study" and open it','Remove the "Social" category','Track the keyword "survey", save, and open the tracked threads','Open your activity and open your most recent post','Turn on calm mode'];
+var activity=[
+ ['Your posts',[['Survey responses for my study','5h'],['Homework 4 grading policy','2d'],['Looking for survey participants','4d']]],
+ ['Replies to your comments',[['Overleaf compile error on the template','9h'],['Peer review deadline question','14h'],['Rubric for the team project check-in','1d']]],
+ ['Your likes',[['Week 14 announcements','1d'],['Individual Project grades','2d'],['Lecture 2.8 cognitive load examples','3d']]]
+];
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function find(n){for(var i=0;i<catalog.length;i++)if(catalog[i].n===n)return catalog[i]}
+function tcol(cat){return calm?'#4A4A4A':cat.t}
+function complete(i){if(!done[i]){done[i]=1;renderTasks()}}
+
+var IC={
+ post:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#999" stroke-width="1.200"><rect x="2" y="3" width="16" height="12" rx="2"/><path d="M5 7h10M5 10h10M5 13h6"/></svg>',
+ ann:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#999" stroke-width="1.200"><path d="M2 15 8 5l4 6 2-3 4 7z"/></svg>',
+ q:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#999" stroke-width="1.200"><circle cx="10" cy="10" r="8"/><path d="M7.800 8a2.300 2.300 0 1 1 3 2.200c-.6.300-.8.700-.8 1.300M10 14v.2"/></svg>',
+ pin:'<svg class="pin" width="13" height="13" viewBox="0 0 16 16" fill="#8a2be2"><path d="M10 1l5 5-2 .5-3 3 .5 3-1.500 1.500-3-3L2 15l-1-1 4-3.500-3-3L3.500 6l3 .5 3-3z"/></svg>',
+ ck:'<svg class="ck" width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="#2fb344" stroke-width="1.600"><path d="m2 7.500 3 3 7-7.500"/></svg>',
+ cm:'<svg width="10" height="10" viewBox="0 0 12 12" fill="#bbb"><path d="M2 1h8a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H5l-3 2V9a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/></svg>',
+ hr:'<svg width="11" height="10" viewBox="0 0 12 11" fill="#bbb"><path d="M6 11 1 6a3 3 0 0 1 5-3 3 3 0 0 1 5 3z"/></svg>',
+ tag:'<svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="#777" stroke-width="1.200"><path d="M1 1h6l6 6-6 6-6-6z"/><circle cx="4.500" cy="4.500" r=".8" fill="#777"/></svg>'
+};
+
+function ordered(){
+  return {s:threads.filter(function(t){return t.staff}),o:threads.filter(function(t){return !t.staff})};
+}
+var POSTS={
+ 'Week 14 announcements':{id:3201,views:318,col:'#1fb36b',
+  body:'This is the final week of lectures. Lectures 14.1 and 14.2 are posted. The peer review window closes on Friday and the final exam opens next Monday. Please read the exam logistics post before you begin.',
+  cs:[{n:'Caleb Whitmore',col:'#1c3fe0',t:'20h',x:'Will the recorded office hours also be posted this week?',l:1,r:[{n:'Priya Anand',col:'#1fb36b',t:'18h',x:'Yes, the recording will be posted by Thursday evening.'}]},
+      {n:'Noor Haddad',col:'#e10fa8',t:'12h',x:'Thank you for the summary.',l:0}]},
+ 'Individual Project grades':{id:3195,views:402,col:'#1c3fe0',
+  body:'Grades for the individual project have been released. Each submission has detailed feedback attached. If you believe there is an error, please submit a regrade request within seven days using the form linked below rather than replying here.',
+  cs:[{n:'Imani Brooks',col:'#8bd600',t:'1d',x:'Is the rubric breakdown visible to everyone or only the final score?',l:2,r:[{n:'Marcus Ellery',col:'#1c3fe0',t:'1d',x:'The breakdown is visible under the feedback tab.'}]},
+      {n:'Anonymous Lynx',col:'#9e9e9e',t:'1d',x:'Thanks for the quick turnaround.',l:0}]},
+ 'Team project recruitement':{id:3190,views:954,col:'#f08a00',
+  body:'Use this thread to find teammates for the group project. Please post your time zone, the topic you are interested in, and how you prefer to communicate. Replies that only say looking for a team will be removed so the thread stays easy to scan.',
+  cs:[{n:'Oskar Lindqvist',col:'#8bd600',t:'3d',x:'UTC+1, interested in accessibility research, and I prefer chat for quick updates.',l:3},
+      {n:'Hana Petrova',col:'#0aa5a0',t:'3d',x:'UTC-5, looking for one more person for a study on onboarding flows.',l:1}]},
+ 'Final exam logistics':{id:3199,views:276,col:'#f08a00',
+  body:'The final exam will be open for 48 hours starting next Monday at 9:00. You will have 3 hours once you begin. Notes are allowed, but collaboration is not. Please make sure your browser is up to date before you start.',
+  cs:[{n:'Felix Aurelio',col:'#e10fa8',t:'4h',x:'Can we pause the timer if our connection drops?',l:2,r:[{n:'Tomas Reyes',col:'#f08a00',t:'3h',x:'The timer keeps running, but contact us right away and we can grant extra time.'}]},
+      {n:'Sana Okafor',col:'#1c3fe0',t:'2h',x:'Is the exam multiple choice only?',l:0}]},
+ 'Quiz 4 study notes':{id:3198,views:121,col:'#e10fa8',
+  body:'I put together my notes for Quiz 4: heuristics, the gulf of evaluation, and the main differences between the evaluation methods. Feel free to add anything I missed. I focused on the examples from the lecture videos.',
+  cs:[{n:'Caleb Whitmore',col:'#1c3fe0',t:'2h',x:'This is really helpful, thanks for sharing.',l:1},
+      {n:'Anonymous Heron',col:'#9e9e9e',t:'1h',x:'You might also add the section on cognitive walkthroughs.',l:0}]},
+ 'Survey responses for my study':{id:3187,views:64,likes:3,col:'#c01fd0',
+  body:'Thank you to everyone who filled in my survey for the group project. I have collected 23 responses so far and I would like to start looking at the first numbers. Does anyone have advice on how to handle partially completed responses before I start the analysis? I am planning to exclude anything under 50% completion, but I am not sure that is the right call.',
+  cs:[{n:'Oskar Lindqvist',col:'#8bd600',t:'3h',x:'Excluding anything under 50% sounds reasonable. I would just report how many responses you dropped and why, so readers can judge for themselves.',l:2,r:[{n:'Klea Pregja',col:'#c01fd0',t:'2h',x:'That is really helpful, I will add a short note to the methods section.'}]},
+      {n:'Noor Haddad',col:'#e10fa8',t:'1h',x:'Congrats on reaching 23. If you can, check whether the dropouts cluster on one question, that might point to a wording problem.',l:1}]},
+ 'Overleaf compile error on the template':{id:3186,views:88,col:'#9e9e9e',
+  body:'When I compile the project template I get an error saying a package file cannot be found. I have not changed anything except the title and author. Has anyone seen this before?',
+  cs:[{n:'Felix Aurelio',col:'#e10fa8',t:'8h',x:'Check that the compiler is set to the same version as the template. Mine failed until I switched it.',l:2},
+      {n:'Imani Brooks',col:'#8bd600',t:'6h',x:'Same issue here, switching the compiler version did not help me.',l:0}]},
+ 'Peer review deadline question':{id:3185,views:97,col:'#8bd600',
+  body:'Does the peer review deadline fall on Friday at midnight or Saturday at midnight? The assignment page says one thing and the calendar says the other.',
+  cs:[{n:'Priya Anand',col:'#1fb36b',t:'12h',x:'Friday at midnight. We will fix the calendar entry.',l:3,r:[{n:'Imani Brooks',col:'#8bd600',t:'11h',x:'Thank you!'}]}]},
+ 'Rubric for the team project check-in':{id:3170,views:143,col:'#1c3fe0',
+  body:'Is there a rubric for the team project check-in? I could only find a short description. I would like to know how much weight each part has so our group can plan what to prepare.',
+  cs:[{n:'Lena Fortuna',col:'#f08a00',t:'20h',x:'The rubric is on the assignment page under the grading tab.',l:2},
+      {n:'Hana Petrova',col:'#0aa5a0',t:'15h',x:'Our team was told it is graded on completeness only.',l:0}]},
+ 'Can someone share their interview script?':{id:3166,views:52,col:'#9e9e9e',
+  body:'I am preparing my first interview for the group project and I am unsure how to structure the questions. If someone is willing to share a script they used, I would be grateful.',
+  cs:[]},
+ 'Homework 4 grading policy':{id:3162,views:212,likes:5,col:'#c01fd0',
+  body:'I wanted to double check how partial credit is applied on Homework 4. The rubric lists five criteria but the instructions only mention a pass or fail threshold. Is each criterion graded independently, and does the late penalty apply before or after the rubric score? Thanks in advance.',
+  cs:[{n:'Marcus Ellery',col:'#1c3fe0',t:'1d',x:'Each criterion is graded independently. The late penalty is applied to the final total, not to the individual criteria.',l:4,r:[{n:'Klea Pregja',col:'#c01fd0',t:'1d',x:'Perfect, that clears it up. Thank you!'}]},
+      {n:'Tomas Reyes',col:'#f08a00',t:'20h',x:'Also worth noting that regrade requests go through the form linked in the syllabus.',l:0}]},
+ 'Lecture 2.8 cognitive load examples':{id:3150,views:167,col:'#e10fa8',
+  body:'I found a few good examples of cognitive load in everyday interfaces: ticket machines, tax forms and some airline check-in flows. I wrote up a short description of each and what could be done to reduce the load. Happy to hear other examples.',
+  cs:[{n:'Noor Haddad',col:'#e10fa8',t:'2d',x:'The tax form example is perfect, I will use it for my reflection.',l:2}]},
+ 'Looking for survey participants':{id:3104,views:140,likes:2,col:'#c01fd0',
+  body:'I am running a short survey (about 8 minutes) on how students organize their study time for this course. It is anonymous and approved for class use. If you have a few minutes to fill it in, please reply here and I will send the link. I am happy to take part in your studies in return.',
+  cs:[{n:'Hana Petrova',col:'#0aa5a0',t:'3d',x:'Happy to help, please send me the link.',l:0},
+      {n:'Imani Brooks',col:'#8bd600',t:'3d',x:'Filled in the survey, it took me about seven minutes. Good luck with the analysis!',l:1,r:[{n:'Klea Pregja',col:'#c01fd0',t:'3d',x:'Thank you so much!'}]}]}
+};
+var HEART='<svg width="22" height="20" viewBox="0 0 12 11" fill="none" stroke="#888" stroke-width=".8"><path d="M6 10.500 1.200 5.800a2.800 2.800 0 0 1 4.800-2.800 2.800 2.800 0 0 1 4.800 2.800z"/></svg>';
+var HEART_S='<svg width="16" height="15" viewBox="0 0 12 11" fill="none" stroke="#999" stroke-width=".9"><path d="M6 10.500 1.200 5.800a2.800 2.800 0 0 1 4.800-2.800 2.800 2.800 0 0 1 4.800 2.800z"/></svg>';
+var CH_DOWN='<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#666" stroke-width="1.600"><path d="m2 4 4 4 4-4"/></svg>';
+var CH_UP='<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#666" stroke-width="1.600"><path d="m2 8 4-4 4 4"/></svg>';
+function avh(col,name){
+  var b=calm?PAL[(name.charCodeAt(0)+name.length)%PAL.length]:col;
+  return '<div class="av" style="background:'+b+';color:'+(calm?'#2B2B2B':'#fff')+'">'+esc(name.charAt(0))+'</div>';
+}
+function ago(tm){var m=/^(\d+)([hd])$/.exec(tm);return m?m[1]+(m[2]==='h'?' hour':' day')+(+m[1]>1?'s':'')+' ago':tm}
+function sqh(cat){return calm?'<i class="sq2" style="background:'+PAL[catalog.indexOf(cat)%PAL.length]+'"></i>':''}
+function cmt(c,r){
+  return '<div class="c'+(r?' r':'')+'">'+avh(c.col,c.n)+'<div class="cb"><div class="hd"><b>'+esc(c.n)+'</b> '+c.t+'</div><div class="ct">'+esc(c.x)+'</div><div class="ft">'+HEART_S+(c.l?'<span>'+c.l+'</span>':'')+'<span>Reply</span><span>···</span></div></div></div>'+(c.r||[]).map(function(x){return cmt(x,1)}).join('');
+}
+function renderDetail(){
+  var d=$('detail'),p=selTitle&&POSTS[selTitle];
+  $('ph').style.display=p?'none':'';
+  d.classList.toggle('on',!!p);
+  $('empty').classList.toggle('thread',!!p);
+  if(!p){d.innerHTML='';return}
+  var t=threads.filter(function(x){return x.title===selTitle})[0],cat=find(t.cat);
+  var likes=p.likes!=null?p.likes:(t.lk||0);
+  d.innerHTML='<h1>'+esc(selTitle)+'<small>#'+p.id+'</small></h1>'+
+   '<div class="ah">'+avh(p.col,t.au)+'<div><div class="nm">'+esc(t.au)+(t.staff?'<span class="badge" style="margin:0 0 0 .5rem">STAFF</span>':'')+'</div><div class="sub2">'+ago(t.tm)+' in <b style="color:'+tcol(cat)+';font-weight:600">'+sqh(cat)+esc(cat.n)+'</b></div></div>'+
+   '<div class="acts">'+(t.pin?'<div class="pl"><svg class="pin" width="18" height="18" viewBox="0 0 16 16" fill="#8a2be2"><path d="M10 1l5 5-2 .5-3 3 .5 3-1.500 1.500-3-3L2 15l-1-1 4-3.500-3-3L3.500 6l3 .5 3-3z"/></svg>PINNED</div>':'')+'<div><svg width="20" height="20" viewBox="0 0 20 20" fill="#777"><path d="m10 1.500 2.600 5.400 5.900.8-4.300 4.100 1 5.800L10 14.800l-5.200 2.800 1-5.800L1.500 7.700l5.900-.8z"/></svg>STAR</div><div><svg width="22" height="20" viewBox="0 0 22 20" fill="#777"><path d="M11 3C5 3 1.500 10 1.500 10S5 17 11 17s9.500-7 9.500-7S17 3 11 3zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>WATCH</div><div><span class="vw">'+p.views+'</span>VIEWS</div></div></div>'+
+   '<div class="pb"><div class="lk2">'+HEART+'<div>'+likes+'</div></div><div class="txt">'+esc(p.body)+'</div></div>'+
+   '<div class="crow">Comment &nbsp; ···</div><div class="srt">Sort by Newest ▾</div>'+
+   '<div class="addc"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#888" stroke-width="1.200"><path d="M3 4h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H9l-4 3v-3H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/></svg>Add comment</div>'+
+   p.cs.map(function(c){return cmt(c,0)}).join('');
+}
+function openPost(title,closeDrawer){selTitle=title;if(closeDrawer)setDrawer(false);renderThreads()}
+function trkMatch(t){var ti=t.title.toLowerCase();return tracked.filter(function(k){return ti.indexOf(k.toLowerCase())>-1})}
+function minsOf(tm){var m=/^(\d+)([hd])$/.exec(tm);return m?(+m[1])*(m[2]==='h'?60:1440):0}
+function carries(t,n){return t.cat===n||(t.xt||[]).indexOf(n)>-1}
+function visible(t){if(catFilter&&!carries(t,catFilter))return false;if(trkOnly&&!trkMatch(t).length)return false;return true}
+function catColor(c){return calm?PAL[catalog.indexOf(c)%PAL.length]:c.c}
+function lbl(name,text,extra){var c=find(name);return c?'<span class="cl'+(extra?' cl2':'')+'" style="color:'+tcol(c)+'">'+sqh(c)+esc(text)+'</span>':''}
+function asqs(list){
+  var h='';
+  list.forEach(function(n){var c=find(n);if(c)h+='<i class="asq" title="Also tagged '+esc(n)+' automatically" style="background:'+catColor(c)+'"></i>'});
+  return h?'<span class="asqs">'+h+'</span>':'';
+}
+function card(t){
+  var sel=t.title===selTitle,m=trkMatch(t);
+  var h='<div class="card'+(m.length?' trk':'')+(sel?' sel':'')+'" data-title="'+esc(t.title)+'"><div class="in"><div class="trow">';
+  if(t.unread)h+='<span class="dot"></span><span style="width:.45rem;flex:none"></span>';
+  h+=IC[t.ty]+'<span class="t">'+esc(t.title)+'</span>';
+  if(t.pin)h+=IC.pin;else if(t.res)h+=IC.ck;
+  h+='</div>';
+  if(t.au||t.lt){
+    h+='<div class="mrow">';
+    if(t.cat)h+=lbl(t.cat,t.lt,!!(t.xt&&t.xt.length));
+    if(t.xt&&t.xt.length)h+=asqs(t.xt);
+    h+='<span class="au">'+esc(t.au)+'</span>';
+    if(t.staff)h+='<span class="badge">STAFF</span>';
+    h+='<span class="tm">'+esc(t.tm)+'</span>';
+    if(t.cm)h+='<span class="cm">'+IC.cm+'<span>'+t.cm+(t.nw?' <span class="nw">('+t.nw+' new)</span>':'')+(t.un?' <span class="nw">('+t.un+' unresolved)</span>':'')+'</span></span>';
+    h+='<span class="hr">'+(t.lk?IC.hr+t.lk:'')+'</span></div>';
+  }
+  return h+'</div></div>';
+}
+function renderThreads(){
+  var o=ordered(),h='',a=o.s.filter(visible),b=o.o.filter(visible);
+  if(!a.length&&!b.length)h='<div class="none">'+(catFilter?'No threads in this category yet.':'')+'</div>';
+  else{
+    a.forEach(function(t){h+=card(t)});
+    if(a.length&&b.length)h+='<div class="bl">Browse later</div>';
+    b.forEach(function(t){h+=card(t)});
+  }
+  $('threads').innerHTML=h;
+  renderDetail();
+}
+function renderFchips(){
+  var e=$('fchips');
+  if(catFilter){e.style.display='block';e.innerHTML='<span class="fchip">Category: '+esc(catFilter)+' <span class="fx" data-clr="1">×</span></span>'}
+  else{e.style.display='none';e.innerHTML=''}
+}
+function setCatFilter(name){
+  catFilter=name;renderFchips();renderCats();renderThreads();
+  if(name.toLowerCase()==='interview study')complete(1);
+}
+function chkT4(){if(trkOnly&&tracked.some(function(k){return k.toLowerCase()==='survey'}))complete(3)}
+function renderCats(){
+  var h='';
+  catalog.forEach(function(c,i){
+    if(!c.side||c.removed)return;
+    h+='<div class="cat'+(c.n===catFilter?' sel':'')+'" data-c="'+i+'"><span class="sq" style="background:'+(calm?PAL[i%PAL.length]:c.c)+'"></span><span>'+esc(c.n)+'</span><span class="x" data-x="'+i+'">×</span></div>';
+  });
+  $('cats').innerHTML=h;
+  if(adding)$('addrow').innerHTML='<div id="addcat"><span style="font-size:1.6rem;line-height:1">+</span><input id="addin" type="text" placeholder="type a category name, then press enter."></div>';
+  else $('addrow').innerHTML='<div id="addcat" data-add="1"><span style="font-size:1.6rem;line-height:1">+</span><span>Add a category</span></div>';
+  if(adding)$('addin').focus();
+}
+function renderTasks(){
+  var h='',n=0;
+  taskNames.forEach(function(t,i){if(done[i])n++;h+='<li class="'+(done[i]?'done':'')+'"><span class="bx">'+(done[i]?'✓':'')+'</span><span>'+t+'</span></li>'});
+  $('tlist').innerHTML=h;
+  $('tlist').style.display=tasksOpen?'':'none';
+  $('reset').style.display=tasksOpen?'':'none';
+  $('tasks').classList.toggle('min',!tasksOpen);
+  $('ttl').textContent=tasksOpen?'Your tasks':'Tasks';
+  $('tcnt').textContent=tasksOpen?n+' of 6 done':n+'/6';
+  $('tcnt').className='cnt'+(n===6?' all':'');
+  $('tcar').innerHTML=tasksOpen?CH_DOWN:CH_UP;
+}
+function renderChip(){
+  var c=$('trkchip');
+  if(!tracked.length){c.style.display='none';return}
+  var n=threads.filter(function(t){return trkMatch(t).length}).length;
+  c.style.display='';
+  c.textContent='Tracked: '+n+(n===1?' thread':' threads');
+  c.className='chip'+(trkOnly?' on':'');
+}
+function toggleTrk(){trkOnly=!trkOnly;renderChip();renderThreads();chkT4()}
+$('trkchip').addEventListener('click',toggleTrk);
+function renderTags(){
+  $('ksave').disabled=draft.length===0;
+  $('tags').innerHTML=draft.map(function(k,i){return '<span class="tag">'+IC.tag+'<span>'+esc(k)+'</span><span class="x" data-k="'+i+'">×</span></span>'}).join('');
+}
+function renderDrawer(){
+  var h='<div class="sec"><h4>Tracked</h4>';
+  if(!tracked.length)h+='<div class="none">No tracked keywords yet. Use Track in the thread list.</div>';
+  else{
+    h+='<div class="tg">'+tracked.map(function(k){return '<span class="tag">'+IC.tag+'<span>'+esc(k)+'</span></span>'}).join('')+'</div>';
+    h+=threads.filter(function(t){return trkMatch(t).length}).sort(function(a,b){return minsOf(a.tm)-minsOf(b.tm)}).slice(0,5).map(function(t){return '<div class="it clk" data-post="'+esc(t.title)+'"><div class="a">'+esc(t.title)+'</div><div class="b">'+t.tm+'</div></div>'}).join('');
+  }
+  h+='</div>';
+  activity.forEach(function(s,si){
+    h+='<div class="sec"><h4>'+s[0]+'</h4>'+s[1].map(function(i,ii){return '<div class="it clk" data-post="'+esc(i[0])+'"'+(si===0&&ii===0?' data-recent="1"':'')+'><div class="a">'+esc(i[0])+'</div><div class="b">'+i[1]+'</div></div>'}).join('')+'</div>';
+  });
+  $('drawer').innerHTML=h;
+}
+function setAT(){
+  $('atsw').classList.toggle('on',autotag);
+  $('atsw').setAttribute('aria-checked',autotag);
+  $('atlbl').style.display=autotag?'block':'none';
+}
+function setCalm(){
+  document.body.classList.toggle('calm',calm);
+  $('calmsw').classList.toggle('on',calm);
+  $('calmsw').setAttribute('aria-checked',calm);
+}
+
+/* toast */
+var toastAct=null;
+function hideToast(){clearTimeout(toastTimer);$('toast').classList.remove('show');toastAct=null}
+function showToast(msg,label,fn){
+  clearTimeout(toastTimer);
+  toastAct=fn||null;
+  $('ttx').textContent=msg;
+  var a=$('tundo');a.textContent=label||'';a.style.display=label?'':'none';
+  $('toast').classList.add('show');
+  toastTimer=setTimeout(hideToast,5000);
+}
+$('tundo').addEventListener('click',function(){var f=toastAct;hideToast();if(f)f()});
+
+/* categories */
+$('catsec').addEventListener('click',function(e){
+  var x=e.target.getAttribute('data-x');
+  if(x!==null){
+    var c=catalog[+x];c.removed=true;
+    if(catFilter===c.n){catFilter=null;renderFchips();renderThreads()}
+    renderCats();
+    showToast('Removed '+c.n+'.','Undo',function(){c.removed=false;renderCats()});
+    if(c.n.toLowerCase()==='social')complete(2);
+    return;
+  }
+  var row=e.target.closest('.cat');
+  if(row){
+    var nm=catalog[+row.getAttribute('data-c')].n;
+    if(catFilter===nm){catFilter=null;renderFchips();renderCats();renderThreads()}
+    else setCatFilter(nm);
+    return;
+  }
+  if(e.target.closest('[data-add]')){adding=true;renderCats()}
+});
+$('catsec').addEventListener('keydown',function(e){
+  if(e.target.id!=='addin')return;
+  if(e.key==='Escape'){adding=false;renderCats()}
+  else if(e.key==='Enter'){
+    var v=e.target.value.trim();
+    if(!v)return;
+    var c={n:v,c:'#9e9e9e',t:'#7a7a7a',side:true,custom:true};
+    catalog.push(c);
+    adding=false;
+    var n=autotag?applyTag(c):0;
+    renderCats();renderThreads();
+    if(n>0)showToast('Auto-tagged '+n+(n===1?' thread':' threads')+' as '+c.n+'.','View',function(){setCatFilter(c.n)});
+    else showToast('Category added. No threads tagged.');
+  }
+});
+function applyTag(c){
+  var w=c.n.toLowerCase().split(/\s+/).filter(Boolean)[0],n=0;
+  c.tagged=true;
+  if(!w)return 0;
+  threads.forEach(function(t){
+    if(t.title.toLowerCase().indexOf(w)>-1&&!carries(t,c.n)){(t.xt=t.xt||[]).push(c.n);n++}
+  });
+  return n;
+}
+$('threads').addEventListener('click',function(e){
+  var c=e.target.closest('.card');
+  if(c)openPost(c.getAttribute('data-title'),false);
+});
+$('fchips').addEventListener('click',function(e){
+  if(e.target.closest('[data-clr]')){catFilter=null;renderFchips();renderCats();renderThreads()}
+});
+$('atsw').addEventListener('click',function(){
+  autotag=!autotag;setAT();
+  if(!autotag)return;
+  complete(0);
+  var last=null,ln=0;
+  catalog.forEach(function(c){
+    if(c.custom&&!c.tagged&&!c.removed){var n=applyTag(c);if(n>0){last=c;ln=n}}
+  });
+  if(last){
+    renderThreads();
+    showToast('Auto-tagged '+ln+(ln===1?' thread':' threads')+' as '+last.n+'.','View',function(){setCatFilter(last.n)});
+  }
+});
+
+/* tasks */
+$('tth').addEventListener('click',function(){tasksOpen=!tasksOpen;renderTasks()});
+
+/* calm */
+$('calmsw').addEventListener('click',function(){
+  calm=!calm;setCalm();renderCats();renderThreads();
+  if(calm)complete(5);
+});
+
+/* modal */
+$('trackbtn').addEventListener('click',function(){draft=tracked.slice();renderTags();$('kw').value='';$('ov').classList.add('open');$('kw').focus()});
+$('kw').addEventListener('keydown',function(e){
+  if(e.key!=='Enter')return;
+  var v=this.value.trim();
+  if(!v)return;
+  if(!draft.some(function(k){return k.toLowerCase()===v.toLowerCase()}))draft.push(v);
+  this.value='';renderTags();
+});
+$('tags').addEventListener('click',function(e){
+  var k=e.target.getAttribute('data-k');
+  if(k!==null){draft.splice(+k,1);renderTags()}
+});
+$('kcancel').addEventListener('click',function(){$('ov').classList.remove('open')});
+$('ksave').addEventListener('click',function(){
+  tracked=draft.slice();
+  $('ov').classList.remove('open');
+  renderChip();renderDrawer();renderThreads();
+  var n=threads.filter(function(t){return trkMatch(t).length}).length;
+  showToast(n+(n===1?' thread matches':' threads match')+' your keywords.',n>0?'View':null,function(){trkOnly=true;renderChip();renderThreads();chkT4()});
+});
+
+/* drawer */
+function setDrawer(open){document.body.classList.toggle('drawer-open',open);$('drawer').classList.toggle('open',open);$('atab').classList.toggle('open',open)}
+$('atab').addEventListener('click',function(){
+  setDrawer(!$('drawer').classList.contains('open'));
+});
+
+$('drawer').addEventListener('click',function(e){var it=e.target.closest('[data-post]');if(!it)return;if(it.hasAttribute('data-recent'))complete(4);openPost(it.getAttribute('data-post'),true)});
+
+
+/* init / reset */
+function init(){
+  selTitle=null;catFilter=null;trkOnly=false;catalog=mkCatalog();threads=mkThreads();tracked=[];draft=[];calm=false;autotag=false;adding=false;tasksOpen=true;
+  done=[0,0,0,0,0,0];
+  hideToast();setDrawer(false);$('ov').classList.remove('open');
+  $('sin').value='';$('kw').value='';
+  setCalm();setAT();
+  renderFchips();renderCats();renderThreads();renderTasks();renderDrawer();renderChip();renderTags();
+  $('cats').scrollTop=0;$('threads').scrollTop=0;$('drawer').scrollTop=0;$('rp').scrollTop=0;
+}
+$('reset').addEventListener('click',init);
+init();
+})();
+</script>
+</body>
+</html>
