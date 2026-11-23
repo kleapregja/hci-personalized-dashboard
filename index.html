@@ -159,6 +159,10 @@ body.calm #toast a{color:var(--purple)}
 #modal .hint{font-size:12px;color:#777;margin-top:.4rem}
 .b-s:disabled{opacity:.4;cursor:not-allowed}
 #drawer .it.clk{cursor:pointer}
+#drawer .it{position:relative}
+#drawer .it .ud{position:absolute;left:-.85rem;top:1rem;width:.45rem;height:.45rem;border-radius:50%;background:var(--dot)}
+#dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:4}
+body.drawer-open #dim{display:block}
 #drawer .tg{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.4rem}
 #drawer .none{font-size:12px;color:#999}
 #threads .none{padding:1.2rem 1.5rem;color:#888;font-size:1rem}
@@ -292,6 +296,8 @@ body.calm .sh,body.calm #drawer h4{color:#5E5280}
     <div class="btns"><button class="b-c" id="kcancel">Cancel</button><button class="b-s" id="ksave" disabled>Save</button></div>
   </div>
 </div>
+
+<div id="dim"></div>
 
 <div id="tasks">
   <button class="th" id="tth" aria-label="Toggle tasks"><span id="ttl">Your tasks</span><span class="cnt" id="tcnt"></span><span id="tcar"></span></button>
@@ -536,11 +542,11 @@ function renderDrawer(){
   if(!tracked.length)h+='<div class="none">No tracked keywords yet. Use Track in the thread list.</div>';
   else{
     h+='<div class="tg">'+tracked.map(function(k){return '<span class="tag">'+IC.tag+'<span>'+esc(k)+'</span></span>'}).join('')+'</div>';
-    h+=threads.filter(function(t){return trkMatch(t).length}).sort(function(a,b){return minsOf(a.tm)-minsOf(b.tm)}).slice(0,5).map(function(t){return '<div class="it clk" data-post="'+esc(t.title)+'"><div class="a">'+esc(t.title)+'</div><div class="b">'+t.tm+'</div></div>'}).join('');
+    h+=threads.filter(function(t){return trkMatch(t).length}).sort(function(a,b){return minsOf(a.tm)-minsOf(b.tm)}).slice(0,5).map(function(t){return '<div class="it clk" data-post="'+esc(t.title)+'">'+(t.unread?'<span class="ud" title="Unread"></span>':'')+'<div class="a">'+esc(t.title)+'</div><div class="b">'+t.tm+'</div></div>'}).join('');
   }
   h+='</div>';
   activity.forEach(function(s,si){
-    h+='<div class="sec"><h4>'+s[0]+'</h4>'+s[1].map(function(i,ii){return '<div class="it clk" data-post="'+esc(i[0])+'"'+(si===0&&ii===0?' data-recent="1"':'')+'><div class="a">'+esc(i[0])+'</div><div class="b">'+i[1]+'</div></div>'}).join('')+'</div>';
+    h+='<div class="sec"><h4>'+s[0]+'</h4>'+s[1].map(function(i,ii){var th=threads.filter(function(t){return t.title===i[0]})[0];return '<div class="it clk" data-post="'+esc(i[0])+'"'+(si===0&&ii===0?' data-recent="1"':'')+'>'+(th&&th.unread?'<span class="ud" title="Unread"></span>':'')+'<div class="a">'+esc(i[0])+'</div><div class="b">'+i[1]+'</div></div>'}).join('')+'</div>';
   });
   $('drawer').innerHTML=h;
 }
@@ -572,7 +578,9 @@ $('tundo').addEventListener('click',function(){var f=toastAct;hideToast();if(f)f
 $('catsec').addEventListener('click',function(e){
   var x=e.target.getAttribute('data-x');
   if(x!==null){
-    var c=catalog[+x];c.removed=true;
+    var c=catalog[+x];
+    if(catalog.filter(function(k){return !k.removed}).length<=1){showToast('Category cannot be deleted, you must have at least one category present.');return}
+    c.removed=true;
     if(catFilter===c.n){catFilter=null;renderFchips();renderThreads()}
     renderCats();
     showToast('Removed '+c.n+'.','Undo',function(){c.removed=false;renderCats()});
@@ -669,6 +677,7 @@ $('ksave').addEventListener('click',function(){
 
 /* drawer */
 function setDrawer(open){document.body.classList.toggle('drawer-open',open);$('drawer').classList.toggle('open',open);$('atab').classList.toggle('open',open)}
+$('dim').addEventListener('click',function(){setDrawer(false)});
 $('atab').addEventListener('click',function(){
   setDrawer(!$('drawer').classList.contains('open'));
 });
