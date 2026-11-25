@@ -80,7 +80,14 @@ body.drawer-open #tasks{right:336px}
 #tasks li .bx{margin-top:.1rem;width:.8rem;height:.8rem;border:1px solid #aaa;border-radius:2px;flex:none;font-size:.65rem;line-height:.65rem;text-align:center;color:#fff}
 #tasks li.done .bx{background:#8a8a8a;border-color:#8a8a8a}
 #tasks li.done span{text-decoration:line-through}
-#reset{display:block;margin-top:.45rem;font-size:.8rem;color:#666;text-decoration:underline}
+#tfoot{display:flex;align-items:center;justify-content:space-between;margin-top:.45rem}
+#reset,#tfin{font-size:.8rem;text-decoration:underline}
+#reset{color:#666}
+#tfin{color:#50288c;font-weight:600}
+#tres{display:none;background:#e9f4ec;border-radius:6px;padding:.6rem .7rem;margin-top:.4rem}
+#tres .rt{font-size:.95rem;font-weight:700;color:#2e5d3a}
+#tres button{display:block;margin:.35rem 0 .3rem;font-size:.85rem;color:#50288c;text-decoration:underline}
+#tres .rs{font-size:12px;color:#666}
 #online{border-top:1px solid #e3e3e3;height:3.1rem;display:flex;align-items:center;justify-content:center;gap:.55rem;font-size:1.05rem;color:#555;flex:none}
 
 /* list */
@@ -306,7 +313,8 @@ body.calm .sh,body.calm #drawer h4{color:#5E5280}
   <button class="th" id="tth" aria-label="Toggle tasks"><span id="ttl">Your tasks</span><span class="cnt" id="tcnt"></span><span id="tcar"></span></button>
   <div id="tnote">Test tasks: they tick off by themselves</div>
   <ul id="tlist"></ul>
-  <button id="reset">Reset prototype</button>
+  <div id="tres"><div class="rt" id="trt"></div><button id="tcopy">Copy result</button><div class="rs">Paste it into the survey.</div></div>
+  <div id="tfoot"><button id="tfin">Finish</button><button id="reset">Reset prototype</button></div>
 </div>
 
 <div id="toast"><span id="ttx"></span><a id="tundo">Undo</a></div>
@@ -346,7 +354,7 @@ function mkThreads(){return [
 ];}
 var selTitle=null;
 var catalog,threads,tracked,draft,calm,autotag,adding,tasksOpen,done,toastTimer,catFilter,trkOnly;
-var taskNames=['Have your own categories applied to threads for you','Group threads for your "Interview Study" and view them together','Keep an eye on threads about "survey" and see them together','Revisit the last thing you posted for Quiz 4','Make the page easier on the eyes'];
+var taskNames=['Keep an eye on threads about "survey" and see them together','Revisit the last thing you posted for Quiz 4','Make the page easier on the eyes'];
 var activity=[
  ['Your posts',[['Quiz 4 study notes','3h'],['Survey responses for my study','5h'],['Homework 4 grading policy','2d']]],
  ['Replies to your comments',[['Overleaf compile error on the template','9h'],['Peer review deadline question','14h'],['Rubric for the team project check-in','1d']]],
@@ -358,7 +366,8 @@ function find(n){for(var i=0;i<catalog.length;i++)if(catalog[i].n===n)return cat
 function tcol(cat){return calm?'#4A4A4A':cat.t}
 var startT=Date.now(),endT=null;
 function fmtT(ms){var s=Math.round(ms/1000);return Math.floor(s/60)+':'+('0'+s%60).slice(-2)}
-function complete(i){if(!done[i]){done[i]=1;if(done.every(Boolean))endT=Date.now();renderTasks()}}
+function resText(){var n=done.filter(Boolean).length;return n+' of 3 done, '+fmtT(endT-startT)}
+function complete(i){if(endT)return;if(!done[i]){done[i]=1;if(done.every(Boolean))endT=Date.now();renderTasks()}}
 
 var IC={
  post:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#999" stroke-width="1.200"><rect x="2" y="3" width="16" height="12" rx="2"/><path d="M5 7h10M5 10h10M5 13h6"/></svg>',
@@ -503,9 +512,8 @@ function renderFchips(){
 }
 function setCatFilter(name){
   catFilter=name;renderFchips();renderCats();renderThreads();
-  if(name.toLowerCase()==='interview study')complete(1);
 }
-function chkT4(){if(trkOnly&&tracked.some(function(k){return k.toLowerCase()==='survey'}))complete(2)}
+function chkT4(){if(trkOnly&&tracked.some(function(k){return k.toLowerCase()==='survey'}))complete(0)}
 function renderCats(){
   var h='';
   catalog.forEach(function(c,i){
@@ -523,12 +531,15 @@ function renderTasks(){
   $('tlist').innerHTML=h;
   $('tlist').style.display=tasksOpen?'':'none';
   $('tnote').style.display=tasksOpen?'':'none';
-  $('reset').style.display=tasksOpen?'':'none';
+  $('tfoot').style.display=tasksOpen?'':'none';
+  $('tfin').style.display=endT?'none':'';
+  $('tres').style.display=(tasksOpen&&endT)?'block':'none';
+  if(endT){$('trt').textContent=resText();$('tcopy').textContent='Copy result'}
   $('tasks').classList.toggle('min',!tasksOpen);
   $('ttl').textContent=tasksOpen?'Your tasks':'Tasks';
-  var tm=(n===5&&endT)?', '+fmtT(endT-startT):'';
-  $('tcnt').textContent=(tasksOpen?n+' of 5 done':n+'/5')+tm;
-  $('tcnt').className='cnt'+(n===5?' all':'');
+  var tm=endT?', '+fmtT(endT-startT):'';
+  $('tcnt').textContent=(tasksOpen?n+' of 3 done':n+'/3')+tm;
+  $('tcnt').className='cnt'+(n===3?' all':'');
   $('tcar').innerHTML=tasksOpen?CH_DOWN:CH_UP;
 }
 function renderChip(){
@@ -642,7 +653,6 @@ $('fchips').addEventListener('click',function(e){
 $('atsw').addEventListener('click',function(){
   autotag=!autotag;setAT();
   if(!autotag)return;
-  complete(0);
   var last=null,ln=0;
   catalog.forEach(function(c){
     if(c.custom&&!c.tagged&&!c.removed){var n=applyTag(c);if(n>0){last=c;ln=n}}
@@ -659,7 +669,7 @@ $('tth').addEventListener('click',function(){tasksOpen=!tasksOpen;renderTasks()}
 /* calm */
 $('calmsw').addEventListener('click',function(){
   calm=!calm;setCalm();renderCats();renderThreads();
-  if(calm)complete(4);
+  if(calm)complete(2);
 });
 
 /* modal */
@@ -691,13 +701,13 @@ $('atab').addEventListener('click',function(){
   setDrawer(!$('drawer').classList.contains('open'));
 });
 
-$('drawer').addEventListener('click',function(e){var it=e.target.closest('[data-post]');if(!it)return;if(it.hasAttribute('data-recent'))complete(3);openPost(it.getAttribute('data-post'),true)});
+$('drawer').addEventListener('click',function(e){var it=e.target.closest('[data-post]');if(!it)return;if(it.hasAttribute('data-recent'))complete(1);openPost(it.getAttribute('data-post'),true)});
 
 
 /* init / reset */
 function init(){
   selTitle=null;catFilter=null;trkOnly=false;catalog=mkCatalog();threads=mkThreads();tracked=[];draft=[];calm=false;autotag=false;adding=false;tasksOpen=true;
-  done=[0,0,0,0,0];startT=Date.now();endT=null;
+  done=[0,0,0];startT=Date.now();endT=null;
   hideToast();setDrawer(false);$('ov').classList.remove('open');
   $('sin').value='';searchNote();$('kw').value='';
   setCalm();setAT();
@@ -705,6 +715,13 @@ function init(){
   $('cats').scrollTop=0;$('threads').scrollTop=0;$('drawer').scrollTop=0;$('rp').scrollTop=0;
 }
 $('reset').addEventListener('click',init);
+$('tfin').addEventListener('click',function(){if(!endT){endT=Date.now();renderTasks()}});
+$('tcopy').addEventListener('click',function(){
+  var t=resText(),b=this,ok=false;
+  try{var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');document.body.removeChild(ta)}catch(x){}
+  if(!ok&&navigator.clipboard){try{navigator.clipboard.writeText(t);ok=true}catch(x){}}
+  b.textContent=ok?'Copied':'Copy failed';
+});
 init();
 })();
 </script>
